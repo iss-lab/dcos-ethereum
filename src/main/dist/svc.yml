@@ -1,0 +1,180 @@
+name: {{FRAMEWORK_NAME}}
+scheduler:
+  principal: {{FRAMEWORK_PRINCIPAL}}
+  user: {{FRAMEWORK_USER}}
+pods:
+  boot:
+    count: {{TASKCFG_ALL_BOOT_NODE_COUNT}}
+    uris:
+      - {{GETH_SCRIPTS_URI}}
+      - {{BOOTSTRAP_URI}}
+    placement: '{{{BOOT_NODE_PLACEMENT}}}'
+    {{#ENABLE_VIRTUAL_NETWORK}}
+    networks:
+      {{VIRTUAL_NETWORK_NAME}}:
+        labels: {{VIRTUAL_NETWORK_PLUGIN_LABELS}}
+    {{/ENABLE_VIRTUAL_NETWORK}}
+    volume:
+      path: "ethdata"
+      type: {{BOOT_NODE_DISK_TYPE}}
+      size: {{BOOT_NODE_DISK}}
+    tasks:
+      node:
+        goal: RUNNING
+        cmd: "./bootstrap -print-env=false && ./run_boot_node.sh"
+        cpus: {{BOOT_NODE_CPUS}}
+        memory: {{BOOT_NODE_MEM}}
+        ports:
+          geth-boot-p2p-port:
+            port: 0
+            advertise: true
+            env-key: GETH_P2P_PORT
+        configs:
+          bootnode:
+            template: bootnode.json
+            dest: ethdata/bootnode.json
+        labels: {{BOOT_NODE_LABELS}}
+  ethstats:
+    count: {{TASKCFG_ALL_ETHSTATS_NODE_COUNT}}
+    uris:
+      - {{GETH_SCRIPTS_URI}}
+      - {{BOOTSTRAP_URI}}
+    placement: '{{{ETHSTATS_NODE_PLACEMENT}}}'
+    {{#ENABLE_VIRTUAL_NETWORK}}
+    networks:
+      {{VIRTUAL_NETWORK_NAME}}:
+        labels: {{VIRTUAL_NETWORK_PLUGIN_LABELS}}
+    {{/ENABLE_VIRTUAL_NETWORK}}
+    image: {{ETHSTATS_DOCKER_IMAGE}}
+    tasks:
+      node:
+        goal: RUNNING
+        cmd: "/bin/bash run.sh"
+        cpus: {{ETHSTATS_NODE_CPUS}}
+        memory: {{ETHSTATS_NODE_MEM}}
+        ports:
+          geth-ethstats-http-port:
+            port: 0
+            advertise: true
+            env-key: PORT
+        labels: {{ETHSTATS_NODE_LABELS}}
+        env:
+          HOST_IP: 0.0.0.0
+  sealer:
+    count: {{SEALER_NODE_COUNT}}
+    uris:
+      - {{GETH_SCRIPTS_URI}}
+      - {{BOOTSTRAP_URI}}
+    placement: '{{{SEALER_NODE_PLACEMENT}}}'
+    {{#ENABLE_VIRTUAL_NETWORK}}
+    networks:
+      {{VIRTUAL_NETWORK_NAME}}:
+        labels: {{VIRTUAL_NETWORK_PLUGIN_LABELS}}
+    {{/ENABLE_VIRTUAL_NETWORK}}
+    volume:
+      path: "ethdata"
+      type: {{SEALER_NODE_DISK_TYPE}}
+      size: {{SEALER_NODE_DISK}}
+    tasks:
+      node:
+        goal: RUNNING
+        cmd: "./bootstrap -print-env=false && ./run_geth_node.sh"
+        cpus: {{SEALER_NODE_CPUS}}
+        memory: {{SEALER_NODE_MEM}}
+        ports:
+          {{#ENABLE_SEALER_RPC}}
+          geth-sealer-http-port:
+            port: 0
+            advertise: true
+            env-key: GETH_HTTP_PORT
+          geth-sealer-ws-port:
+            port: 0
+            advertise: true
+            env-key: GETH_WS_PORT
+          {{/ENABLE_SEALER_RPC}}
+          geth-sealer-p2p-port:
+            port: 0
+            advertise: true
+            env-key: GETH_P2P_PORT
+        configs:
+          bootnode:
+            template: bootnode.json
+            dest: ethdata/bootnode.json
+          sealers:
+            template: sealers.json
+            dest: ethdata/accounts.json
+          genesis:
+            template: genesis.json
+            dest: ethdata/genesis.json
+        labels: {{SEALER_NODE_LABELS}}
+  client:
+    count: {{CLIENT_NODE_COUNT}}
+    uris:
+      - {{GETH_SCRIPTS_URI}}
+      - {{BOOTSTRAP_URI}}
+    placement: '{{{CLIENT_NODE_PLACEMENT}}}'
+    {{#ENABLE_VIRTUAL_NETWORK}}
+    networks:
+      {{VIRTUAL_NETWORK_NAME}}:
+        labels: {{VIRTUAL_NETWORK_PLUGIN_LABELS}}
+    {{/ENABLE_VIRTUAL_NETWORK}}
+    volume:
+      path: "ethdata"
+      type: {{CLIENT_NODE_DISK_TYPE}}
+      size: {{CLIENT_NODE_DISK}}
+    tasks:
+      node:
+        goal: RUNNING
+        cmd: "./bootstrap -print-env=false && ./run_geth_node.sh"
+        cpus: {{CLIENT_NODE_CPUS}}
+        memory: {{CLIENT_NODE_MEM}}
+        ports:
+          {{#ENABLE_CLIENT_RPC}}
+          geth-client-http-port:
+            port: 0
+            advertise: true
+            env-key: GETH_HTTP_PORT
+          geth-client-ws-port:
+            port: 0
+            advertise: true
+            env-key: GETH_WS_PORT
+          {{/ENABLE_CLIENT_RPC}}
+          geth-client-p2p-port:
+            port: 0
+            advertise: true
+            env-key: GETH_P2P_PORT
+        configs:
+          bootnode:
+            template: bootnode.json
+            dest: ethdata/bootnode.json
+          clients:
+            template: clients.json
+            dest: ethdata/accounts.json
+          genesis:
+            template: genesis.json
+            dest: ethdata/genesis.json
+        labels: {{CLIENT_NODE_LABELS}}
+plans:
+  deploy:
+    strategy: serial
+    phases:
+      boot-deploy:
+        strategy: serial
+        pod: boot
+        steps:
+          - default: [[node]]
+      ethstats-deploy:
+        strategy: parallel
+        pod: ethstats
+        steps:
+          - default: [[node]]
+      sealer-deploy:
+        strategy: parallel
+        pod: sealer
+        steps:
+          - default: [[node]]
+      client-deploy:
+        strategy: parallel
+        pod: client
+        steps:
+          - default: [[node]]

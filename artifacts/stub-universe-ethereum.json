@@ -1,0 +1,541 @@
+{
+  "packages": [
+    {
+      "packagingVersion": "4.0",
+      "upgradesFrom": [
+        "*"
+      ],
+      "downgradesTo": [
+        "*"
+      ],
+      "minDcosReleaseVersion": "1.10",
+      "name": "ethereum",
+      "version": "0.1.0",
+      "maintainer": "andrew.kerrigan@issgovernance.com",
+      "description": "Ethereum on DC/OS",
+      "selected": false,
+      "framework": true,
+      "tags": [
+        "ethereum",
+        "ethereum",
+        "blockchain"
+      ],
+      "postInstallNotes": "DC/OS Ethereum is being installed!\n\n\tDocumentation: https://github.com/iss-lab/dcos-ethereum\n\tIssues: https://github.com/iss-lab/dcos-ethereum/issues",
+      "postUninstallNotes": "DC/OS Ethereum is being uninstalled.",
+      "releaseVersion": 0,
+      "config": {
+        "type": "object",
+        "properties": {
+          "service": {
+            "type": "object",
+            "description": "DC/OS service configuration properties",
+            "properties": {
+              "name": {
+                "description": "The name of the service instance",
+                "type": "string",
+                "default": "ethereum",
+                "title": "Service name"
+              },
+              "user": {
+                "description": "The user that the service will run as.",
+                "type": "string",
+                "default": "root",
+                "title": "User"
+              },
+              "service_account": {
+                "description": "The service account for DC/OS service authentication. This is typically left empty to use the default unless service authentication is needed. The value given here is passed as the principal of Mesos framework.",
+                "type": "string",
+                "default": ""
+              },
+              "service_account_secret": {
+                "description": "Name of the Secret Store credentials to use for DC/OS service authentication. This should be left empty unless service authentication is needed.",
+                "type": "string",
+                "default": "",
+                "title": "Credential secret name (optional)"
+              },
+              "virtual_network_enabled": {
+                "description": "Enable virtual networking",
+                "type": "boolean",
+                "default": false
+              },
+              "virtual_network_name": {
+                "description": "The name of the virtual network to join",
+                "type": "string",
+                "default": "dcos"
+              },
+              "virtual_network_plugin_labels": {
+                "description": "Labels to pass to the virtual network plugin. Comma-separated key:value pairs. For example: k_0:v_0,k_1:v_1,...,k_n:v_n",
+                "type": "string",
+                "default": ""
+              },
+              "mesos_api_version": {
+                "description": "Configures the Mesos API version to use. Possible values: V0 (non-HTTP), V1 (HTTP)",
+                "type": "string",
+                "enum": [
+                  "V0",
+                  "V1"
+                ],
+                "default": "V1"
+              },
+              "log_level": {
+                "description": "The log level for the DC/OS service.",
+                "type": "string",
+                "enum": [
+                  "OFF",
+                  "FATAL",
+                  "ERROR",
+                  "WARN",
+                  "INFO",
+                  "DEBUG",
+                  "TRACE",
+                  "ALL"
+                ],
+                "default": "INFO"
+              }
+            },
+            "required": [
+              "name",
+              "user"
+            ]
+          },
+          "geth": {
+            "description": "Common geth node configuration.",
+            "type": "object",
+            "properties": {
+              "network_id": {
+                "title": "Chain / Network ID",
+                "description": "Chain or Network ID.",
+                "type": "integer",
+                "default": 18
+              },
+              "syncmode": {
+                "title": "Sync mode",
+                "description": "Geth sync mode, one of fast, full (default), or light.",
+                "enum": [
+                  "fast",
+                  "full",
+                  "light"
+                ],
+                "default": "full"
+              },
+              "create_genesis": {
+                "description": "Create a genesis.json and initialize each node with it.",
+                "type": "boolean",
+                "default": true
+              },
+              "consensus_engine": {
+                "title": "Consensus engine",
+                "description": "Consensus engine to use. One of: ethash (proof-of-work) or clique (default, proof-of-authority).",
+                "enum": [
+                  "ethash",
+                  "clique"
+                ],
+                "default": "clique"
+              },
+              "clique_period": {
+                "title": "Clique period",
+                "description": "Number of seconds blocks should take, used only with clique consensus engine.",
+                "type": "integer",
+                "default": 15
+              }
+            },
+            "required": [
+              "network_id",
+              "syncmode",
+              "create_genesis"
+            ]
+          },
+          "boot": {
+            "description": "Boot pod configuration properties",
+            "type": "object",
+            "properties": {
+              "count": {
+                "title": "Node count",
+                "description": "Number of Node pods to run",
+                "type": "integer",
+                "default": 1
+              },
+              "cpus": {
+                "title": "CPU count",
+                "description": "Node CPU requirements",
+                "type": "number",
+                "default": 0.1
+              },
+              "mem": {
+                "title": "Memory size (MB)",
+                "description": "Node mem requirements (in MB)",
+                "type": "integer",
+                "default": 256
+              },
+              "disk": {
+                "title": "Disk size (MB)",
+                "description": "Node persistent disk requirements (in MB)",
+                "type": "integer",
+                "default": 15000
+              },
+              "disk_type": {
+                "title": "Disk type [ROOT, MOUNT]",
+                "description": "Mount volumes require preconfiguration in DC/OS",
+                "enum": [
+                  "ROOT",
+                  "MOUNT"
+                ],
+                "default": "ROOT"
+              },
+              "placement_constraint": {
+                "title": "Placement constraint",
+                "description": "Placement constraints for nodes. Example: [[\"hostname\", \"UNIQUE\"]]",
+                "type": "string",
+                "default": "",
+                "media": {
+                  "type": "application/x-zone-constraints+json"
+                }
+              },
+              "labels": {
+                "title": "Labels",
+                "description": "Custom mesos task labels for boot nodes",
+                "type": "string",
+                "default": ""
+              },
+              "verbosity": {
+                "title": "Log Verbosity [0-9]",
+                "description": "Geth node log verbosity level",
+                "type": "integer",
+                "default": 3
+              }
+            },
+            "required": [
+              "count",
+              "cpus",
+              "mem",
+              "disk",
+              "disk_type"
+            ]
+          },
+          "ethstats": {
+            "description": "Ethstats pod configuration properties",
+            "type": "object",
+            "properties": {
+              "count": {
+                "title": "Node count",
+                "description": "Number of Node pods to run",
+                "type": "integer",
+                "default": 1
+              },
+              "cpus": {
+                "title": "CPU count",
+                "description": "Node CPU requirements",
+                "type": "number",
+                "default": 1
+              },
+              "mem": {
+                "title": "Memory size (MB)",
+                "description": "Node mem requirements (in MB)",
+                "type": "integer",
+                "default": 1024
+              },
+              "placement_constraint": {
+                "title": "Placement constraint",
+                "description": "Placement constraints for nodes. Example: [[\"hostname\", \"UNIQUE\"]]",
+                "type": "string",
+                "default": "",
+                "media": {
+                  "type": "application/x-zone-constraints+json"
+                }
+              },
+              "labels": {
+                "title": "Labels",
+                "description": "Custom mesos task labels for ethstats nodes",
+                "type": "string",
+                "default": ""
+              },
+              "verbosity": {
+                "title": "Log Verbosity [0-3]",
+                "description": "Ethstats node log verbosity level",
+                "type": "integer",
+                "default": 3
+              },
+              "websocket_secret": {
+                "description": "Secret for connecting to ethstats via websocket.",
+                "type": "string",
+                "default": "my-ws-secret"
+              }
+            },
+            "required": [
+              "count",
+              "cpus",
+              "mem",
+              "websocket_secret"
+            ]
+          },
+          "sealer": {
+            "description": "Sealer pod configuration properties",
+            "type": "object",
+            "properties": {
+              "count": {
+                "title": "Node count",
+                "description": "Number of Node pods to run",
+                "type": "integer",
+                "default": 3
+              },
+              "cpus": {
+                "title": "CPU count",
+                "description": "Node CPU requirements",
+                "type": "number",
+                "default": 1
+              },
+              "mem": {
+                "title": "Memory size (MB)",
+                "description": "Node mem requirements (in MB)",
+                "type": "integer",
+                "default": 1024
+              },
+              "disk": {
+                "title": "Disk size (MB)",
+                "description": "Node persistent disk requirements (in MB)",
+                "type": "integer",
+                "default": 15000
+              },
+              "disk_type": {
+                "title": "Disk type [ROOT, MOUNT]",
+                "description": "Mount volumes require preconfiguration in DC/OS",
+                "enum": [
+                  "ROOT",
+                  "MOUNT"
+                ],
+                "default": "ROOT"
+              },
+              "placement_constraint": {
+                "title": "Placement constraint",
+                "description": "Placement constraints for nodes. Example: [[\"hostname\", \"UNIQUE\"]]",
+                "type": "string",
+                "default": "",
+                "media": {
+                  "type": "application/x-zone-constraints+json"
+                }
+              },
+              "labels": {
+                "title": "Labels",
+                "description": "Custom mesos task labels for sealer nodes",
+                "type": "string",
+                "default": ""
+              },
+              "args": {
+                "title": "CLI arguments",
+                "description": "Additional sealer node CLI arguments for the geth command. See github.com/ethereum/go-ethereum/wiki/Command-Line-Options",
+                "type": "string",
+                "default": "--metrics --mine --minerthreads=1"
+              },
+              "verbosity": {
+                "title": "Log Verbosity [0-9]",
+                "description": "Geth node log verbosity level",
+                "type": "integer",
+                "default": 3
+              },
+              "rpcapi": {
+                "title": "RPC API",
+                "description": "The API functionality to expose.",
+                "type": "string",
+                "default": "debug,db,personal,eth,network,web3,net,miner"
+              },
+              "create_accounts": {
+                "description": "Create and pre-fund an account for each sealer node when true.",
+                "type": "boolean",
+                "default": true
+              },
+              "unlock_accounts": {
+                "description": "Unlock each sealer account upon starting geth.",
+                "type": "boolean",
+                "default": true
+              },
+              "account_privatekeys": {
+                "description": "Comma separated list of private keys to use for sealer accounts. Must be used when create_account is false.",
+                "type": "string",
+                "default": ""
+              },
+              "account_secret": {
+                "description": "Account secret passphrase to use for all sealer accounts.",
+                "type": "string",
+                "default": "p@ssw0rd"
+              }
+            },
+            "required": [
+              "count",
+              "cpus",
+              "mem",
+              "disk",
+              "disk_type",
+              "create_accounts",
+              "account_secret"
+            ]
+          },
+          "client": {
+            "description": "Client pod configuration properties",
+            "type": "object",
+            "properties": {
+              "count": {
+                "title": "Client node count",
+                "description": "Number of Node pods to run",
+                "type": "integer",
+                "default": 2
+              },
+              "cpus": {
+                "title": "CPU count",
+                "description": "Node CPU requirements",
+                "type": "number",
+                "default": 1
+              },
+              "mem": {
+                "title": "Memory size (MB)",
+                "description": "Node mem requirements (in MB)",
+                "type": "integer",
+                "default": 1024
+              },
+              "disk": {
+                "title": "Disk size (MB)",
+                "description": "Node persistent disk requirements (in MB)",
+                "type": "integer",
+                "default": 15000
+              },
+              "disk_type": {
+                "title": "Disk type [ROOT, MOUNT]",
+                "description": "Mount volumes require preconfiguration in DC/OS",
+                "enum": [
+                  "ROOT",
+                  "MOUNT"
+                ],
+                "default": "ROOT"
+              },
+              "placement_constraint": {
+                "title": "Placement constraint",
+                "description": "Placement constraints for nodes. Example: [[\"hostname\", \"UNIQUE\"]]",
+                "type": "string",
+                "default": "",
+                "media": {
+                  "type": "application/x-zone-constraints+json"
+                }
+              },
+              "labels": {
+                "title": "Labels",
+                "description": "Custom mesos task labels for client nodes",
+                "type": "string",
+                "default": ""
+              },
+              "args": {
+                "title": "CLI arguments",
+                "description": "Additional client node CLI arguments for the geth command. See github.com/ethereum/go-ethereum/wiki/Command-Line-Options",
+                "type": "string",
+                "default": "--metrics"
+              },
+              "verbosity": {
+                "title": "Log Verbosity [0-9]",
+                "description": "Geth node log verbosity level",
+                "type": "integer",
+                "default": 3
+              },
+              "rpcapi": {
+                "title": "RPC API",
+                "description": "The API functionality to expose.",
+                "type": "string",
+                "default": "debug,db,personal,eth,network,web3,net,miner"
+              },
+              "create_accounts": {
+                "description": "Create and pre-fund an account for each client node when true.",
+                "type": "boolean",
+                "default": true
+              },
+              "unlock_accounts": {
+                "description": "Unlock each client account upon starting geth.",
+                "type": "boolean",
+                "default": true
+              },
+              "account_privatekeys": {
+                "description": "Comma separated list of private keys to use for client accounts. Must be used when create_account is false.",
+                "type": "string",
+                "default": ""
+              },
+              "account_secret": {
+                "description": "Account secret passphrase to use for all client accounts.",
+                "type": "string",
+                "default": "p@ssw0rd"
+              }
+            },
+            "required": [
+              "count",
+              "cpus",
+              "mem",
+              "disk",
+              "disk_type",
+              "create_accounts",
+              "account_secret"
+            ]
+          }
+        }
+      },
+      "marathon": {
+        "v2AppMustacheTemplate": "ewogICJpZCI6ICJ7e3NlcnZpY2UubmFtZX19IiwKICAiY3B1cyI6IDEuMCwKICAibWVtIjogMTAyNCwKICAiaW5zdGFuY2VzIjogMSwKICAidXNlciI6ICJ7e3NlcnZpY2UudXNlcn19IiwKICAiY21kIjogImV4cG9ydCBMRF9MSUJSQVJZX1BBVEg9JE1FU09TX1NBTkRCT1gvbGlibWVzb3MtYnVuZGxlL2xpYjokTERfTElCUkFSWV9QQVRIOyBleHBvcnQgTUVTT1NfTkFUSVZFX0pBVkFfTElCUkFSWT0kKGxzICRNRVNPU19TQU5EQk9YL2xpYm1lc29zLWJ1bmRsZS9saWIvbGlibWVzb3MtKi5zbyk7IGV4cG9ydCBKQVZBX0hPTUU9JChscyAtZCAkTUVTT1NfU0FOREJPWC9qZGsqL2pyZS8pOyBleHBvcnQgSkFWQV9IT01FPSR7SkFWQV9IT01FJS99OyBleHBvcnQgUEFUSD0kKGxzIC1kICRKQVZBX0hPTUUvYmluKTokUEFUSCAmJiBleHBvcnQgSkFWQV9PUFRTPVwiLVhtczI1Nk0gLVhteDUxMk0gLVhYOi1IZWFwRHVtcE9uT3V0T2ZNZW1vcnlFcnJvclwiICYmIC4vYm9vdHN0cmFwIC1wcmludC1lbnY9ZmFsc2UgLXJlc29sdmU9ZmFsc2UgLXRlbXBsYXRlPWZhbHNlICYmIC4vYm9vdHN0cmFwX2dldGguc2ggJiYgLi9ldGhlcmV1bS1zY2hlZHVsZXIvYmluL2V0aGVyZXVtIC4vZXRoZXJldW0tc2NoZWR1bGVyL3N2Yy55bWwiLAogICJsYWJlbHMiOiB7CiAgICAiRENPU19DT01NT05TX0FQSV9WRVJTSU9OIjogInYxIiwKICAgICJEQ09TX0NPTU1PTlNfVU5JTlNUQUxMIjogInRydWUiLAogICAgIkRDT1NfUEFDS0FHRV9GUkFNRVdPUktfTkFNRSI6ICJ7e3NlcnZpY2UubmFtZX19IiwKICAgICJNQVJBVEhPTl9TSU5HTEVfSU5TVEFOQ0VfQVBQIjogInRydWUiLAogICAgIkRDT1NfU0VSVklDRV9OQU1FIjogInt7c2VydmljZS5uYW1lfX0iLAogICAgIkRDT1NfU0VSVklDRV9QT1JUX0lOREVYIjogIjAiLAogICAgIkRDT1NfU0VSVklDRV9TQ0hFTUUiOiAiaHR0cCIKICB9LAogIHt7I3NlcnZpY2Uuc2VydmljZV9hY2NvdW50X3NlY3JldH19CiAgInNlY3JldHMiOiB7CiAgICAic2VydmljZUNyZWRlbnRpYWwiOiB7CiAgICAgICJzb3VyY2UiOiAie3tzZXJ2aWNlLnNlcnZpY2VfYWNjb3VudF9zZWNyZXR9fSIKICAgIH0KICB9LAogIHt7L3NlcnZpY2Uuc2VydmljZV9hY2NvdW50X3NlY3JldH19CiAgImNvbnRhaW5lciI6IHsKICAgICJ0eXBlIjogIk1FU09TIiwKICAgICJ2b2x1bWVzIjogW3sKICAgICAgImNvbnRhaW5lclBhdGgiOiAiZXRoZGF0YSIsCiAgICAgICJtb2RlIjogIlJXIiwKICAgICAgInBlcnNpc3RlbnQiOiB7CiAgICAgICAgInR5cGUiOiAiUk9PVCIsCiAgICAgICAgInNpemUiOiAxMjgKICAgICAgfQogICAgfV0KICB9LAogICJlbnYiOiB7CiAgICAiUEFDS0FHRV9OQU1FIjogImV0aGVyZXVtIiwKICAgICJQQUNLQUdFX1ZFUlNJT04iOiAiMC4xLjAiLAogICAgIlBBQ0tBR0VfQlVJTERfVElNRV9FUE9DSF9NUyI6ICIxNTQzNjAzMDE3ODc4IiwKICAgICJQQUNLQUdFX0JVSUxEX1RJTUVfU1RSIjogIkZyaSBOb3YgMzAgMjAxOCAxODozNjo1NyArMDAwMCIsCiAgICAiRlJBTUVXT1JLX05BTUUiOiAie3tzZXJ2aWNlLm5hbWV9fSIsCiAgICAiRlJBTUVXT1JLX1VTRVIiOiAie3tzZXJ2aWNlLnVzZXJ9fSIsCiAgICAiRlJBTUVXT1JLX1BSSU5DSVBBTCI6ICJ7e3NlcnZpY2Uuc2VydmljZV9hY2NvdW50fX0iLAogICAgIkZSQU1FV09SS19MT0dfTEVWRUwiOiAie3tzZXJ2aWNlLmxvZ19sZXZlbH19IiwKICAgICJNRVNPU19BUElfVkVSU0lPTiI6ICJ7e3NlcnZpY2UubWVzb3NfYXBpX3ZlcnNpb259fSIsCiAgICB7eyNzZXJ2aWNlLnZpcnR1YWxfbmV0d29ya19lbmFibGVkfX0KICAgICJFTkFCTEVfVklSVFVBTF9ORVRXT1JLIjogInllcyIsCiAgICAiVklSVFVBTF9ORVRXT1JLX05BTUUiOiAie3tzZXJ2aWNlLnZpcnR1YWxfbmV0d29ya19uYW1lfX0iLAogICAgIlZJUlRVQUxfTkVUV09SS19QTFVHSU5fTEFCRUxTIjogInt7c2VydmljZS52aXJ0dWFsX25ldHdvcmtfcGx1Z2luX2xhYmVsc319IiwKICAgIHt7L3NlcnZpY2UudmlydHVhbF9uZXR3b3JrX2VuYWJsZWR9fQogICAgIlRBU0tDRkdfQUxMX05FVFdPUktfSUQiOiAie3tnZXRoLm5ldHdvcmtfaWR9fSIsCiAgICAiVEFTS0NGR19BTExfR0VUSF9TWU5DTU9ERSI6ICJ7e2dldGguc3luY21vZGV9fSIsCiAgICAiVEFTS0NGR19BTExfRVRIU1RBVFNfTk9ERV9DT1VOVCI6ICJ7e2V0aHN0YXRzLmNvdW50fX0iLAogICAgIlRBU0tDRkdfQUxMX0JPT1RfTk9ERV9DT1VOVCI6ICJ7e2Jvb3QuY291bnR9fSIsCiAgICB7eyNnZXRoLmNyZWF0ZV9nZW5lc2lzfX0KICAgICJUQVNLQ0ZHX0FMTF9DUkVBVEVfR0VORVNJUyI6ICJ5ZXMiLAogICAge3svZ2V0aC5jcmVhdGVfZ2VuZXNpc319CiAgICAiR0VORVNJU19FTkdJTkUiOiAie3tnZXRoLmNvbnNlbnN1c19lbmdpbmV9fSIsCiAgICAiR0VORVNJU19QRVJJT0QiOiAie3tnZXRoLmNsaXF1ZV9wZXJpb2R9fSIsCiAgICAiQk9PVF9OT0RFX0NQVVMiOiAie3tib290LmNwdXN9fSIsCiAgICAiQk9PVF9OT0RFX01FTSI6ICJ7e2Jvb3QubWVtfX0iLAogICAgIkJPT1RfTk9ERV9ESVNLIjogInt7Ym9vdC5kaXNrfX0iLAogICAgIkJPT1RfTk9ERV9ESVNLX1RZUEUiOiAie3tib290LmRpc2tfdHlwZX19IiwKICAgICJCT09UX05PREVfUExBQ0VNRU5UIjogInt7e2Jvb3QucGxhY2VtZW50X2NvbnN0cmFpbnR9fX0iLAogICAgIkJPT1RfTk9ERV9MQUJFTFMiOiAie3tib290LmxhYmVsc319IiwKICAgICJUQVNLQ0ZHX0JPT1RfR0VUSF9WRVJCT1NJVFkiOiAie3tib290LnZlcmJvc2l0eX19IiwKICAgICJFVEhTVEFUU19ET0NLRVJfSU1BR0UiOiAie3tyZXNvdXJjZS5hc3NldHMuY29udGFpbmVyLmRvY2tlci5ldGhzdGF0c19kb2NrZXJ9fSIsCiAgICAiRVRIU1RBVFNfTk9ERV9DUFVTIjogInt7ZXRoc3RhdHMuY3B1c319IiwKICAgICJFVEhTVEFUU19OT0RFX01FTSI6ICJ7e2V0aHN0YXRzLm1lbX19IiwKICAgICJFVEhTVEFUU19OT0RFX1BMQUNFTUVOVCI6ICJ7e3tldGhzdGF0cy5wbGFjZW1lbnRfY29uc3RyYWludH19fSIsCiAgICAiRVRIU1RBVFNfTk9ERV9MQUJFTFMiOiAie3tldGhzdGF0cy5sYWJlbHN9fSIsCiAgICAiVEFTS0NGR19FVEhTVEFUU19WRVJCT1NJVFkiOiAie3tldGhzdGF0cy52ZXJib3NpdHl9fSIsCiAgICAiVEFTS0NGR19BTExfV1NfU0VDUkVUIjogInt7ZXRoc3RhdHMud2Vic29ja2V0X3NlY3JldH19IiwKICAgICJTRUFMRVJfTk9ERV9DT1VOVCI6ICJ7e3NlYWxlci5jb3VudH19IiwKICAgICJTRUFMRVJfTk9ERV9DUFVTIjogInt7c2VhbGVyLmNwdXN9fSIsCiAgICAiU0VBTEVSX05PREVfTUVNIjogInt7c2VhbGVyLm1lbX19IiwKICAgICJTRUFMRVJfTk9ERV9ESVNLIjogInt7c2VhbGVyLmRpc2t9fSIsCiAgICAiU0VBTEVSX05PREVfRElTS19UWVBFIjogInt7c2VhbGVyLmRpc2tfdHlwZX19IiwKICAgICJTRUFMRVJfTk9ERV9QTEFDRU1FTlQiOiAie3t7c2VhbGVyLnBsYWNlbWVudF9jb25zdHJhaW50fX19IiwKICAgICJTRUFMRVJfTk9ERV9MQUJFTFMiOiAie3tzZWFsZXIubGFiZWxzfX0iLAogICAgIlRBU0tDRkdfU0VBTEVSX0dFVEhfQVJHUyI6ICJ7e3NlYWxlci5hcmdzfX0iLAogICAgIlRBU0tDRkdfU0VBTEVSX0dFVEhfVkVSQk9TSVRZIjogInt7c2VhbGVyLnZlcmJvc2l0eX19IiwKICAgIHt7I3NlYWxlci5ycGNhcGl9fQogICAgIlRBU0tDRkdfU0VBTEVSX0dFVEhfUlBDQVBJIjogInt7c2VhbGVyLnJwY2FwaX19IiwKICAgICJFTkFCTEVfU0VBTEVSX1JQQyI6ICJ5ZXMiLAogICAge3svc2VhbGVyLnJwY2FwaX19CiAgICB7eyNzZWFsZXIuY3JlYXRlX2FjY291bnRzfX0KICAgICJUQVNLQ0ZHX1NFQUxFUl9DUkVBVEVfQUNDT1VOVFMiOiAieWVzIiwKICAgIHt7L3NlYWxlci5jcmVhdGVfYWNjb3VudHN9fQogICAge3sjc2VhbGVyLnVubG9ja19hY2NvdW50c319CiAgICAiVEFTS0NGR19TRUFMRVJfVU5MT0NLX0FDQ09VTlRTIjogInllcyIsCiAgICB7ey9zZWFsZXIudW5sb2NrX2FjY291bnRzfX0KICAgIHt7I3NlYWxlci5hY2NvdW50X3ByaXZhdGVrZXlzfX0KICAgICJUQVNLQ0ZHX1NFQUxFUl9BQ0NPVU5UX1BSSVZBVEVLRVlTIjogInt7c2VhbGVyLmFjY291bnRfcHJpdmF0ZWtleXN9fSIsCiAgICB7ey9zZWFsZXIuYWNjb3VudF9wcml2YXRla2V5c319CiAgICAiVEFTS0NGR19TRUFMRVJfQUNDT1VOVF9TRUNSRVQiOiAie3tzZWFsZXIuYWNjb3VudF9zZWNyZXR9fSIsCiAgICAiQ0xJRU5UX05PREVfQ09VTlQiOiAie3tjbGllbnQuY291bnR9fSIsCiAgICAiQ0xJRU5UX05PREVfQ1BVUyI6ICJ7e2NsaWVudC5jcHVzfX0iLAogICAgIkNMSUVOVF9OT0RFX01FTSI6ICJ7e2NsaWVudC5tZW19fSIsCiAgICAiQ0xJRU5UX05PREVfRElTSyI6ICJ7e2NsaWVudC5kaXNrfX0iLAogICAgIkNMSUVOVF9OT0RFX0RJU0tfVFlQRSI6ICJ7e2NsaWVudC5kaXNrX3R5cGV9fSIsCiAgICAiQ0xJRU5UX05PREVfUExBQ0VNRU5UIjogInt7e2NsaWVudC5wbGFjZW1lbnRfY29uc3RyYWludH19fSIsCiAgICAiQ0xJRU5UX05PREVfTEFCRUxTIjogInt7Y2xpZW50LmxhYmVsc319IiwKICAgICJUQVNLQ0ZHX0NMSUVOVF9HRVRIX0FSR1MiOiAie3tjbGllbnQuYXJnc319IiwKICAgICJUQVNLQ0ZHX0NMSUVOVF9HRVRIX1ZFUkJPU0lUWSI6ICJ7e2NsaWVudC52ZXJib3NpdHl9fSIsCiAgICB7eyNjbGllbnQucnBjYXBpfX0KICAgICJUQVNLQ0ZHX0NMSUVOVF9HRVRIX1JQQ0FQSSI6ICJ7e2NsaWVudC5ycGNhcGl9fSIsCiAgICAiRU5BQkxFX0NMSUVOVF9SUEMiOiAieWVzIiwKICAgIHt7L2NsaWVudC5ycGNhcGl9fQogICAge3sjY2xpZW50LmNyZWF0ZV9hY2NvdW50c319CiAgICAiVEFTS0NGR19DTElFTlRfQ1JFQVRFX0FDQ09VTlRTIjogInllcyIsCiAgICB7ey9jbGllbnQuY3JlYXRlX2FjY291bnRzfX0KICAgIHt7I2NsaWVudC51bmxvY2tfYWNjb3VudHN9fQogICAgIlRBU0tDRkdfQ0xJRU5UX1VOTE9DS19BQ0NPVU5UUyI6ICJ5ZXMiLAogICAge3svY2xpZW50LnVubG9ja19hY2NvdW50c319CiAgICB7eyNjbGllbnQuYWNjb3VudF9wcml2YXRla2V5c319CiAgICAiVEFTS0NGR19DTElFTlRfQUNDT1VOVF9QUklWQVRFS0VZUyI6ICJ7e2NsaWVudC5hY2NvdW50X3ByaXZhdGVrZXlzfX0iLAogICAge3svY2xpZW50LmFjY291bnRfcHJpdmF0ZWtleXN9fQogICAgIlRBU0tDRkdfQ0xJRU5UX0FDQ09VTlRfU0VDUkVUIjogInt7Y2xpZW50LmFjY291bnRfc2VjcmV0fX0iLAogICAgIkdFVEhfU0NSSVBUU19VUkkiOiAie3tyZXNvdXJjZS5hc3NldHMudXJpcy5nZXRoLXNjcmlwdHMtemlwfX0iLAogICAgIkpBVkFfVVJJIjogInt7cmVzb3VyY2UuYXNzZXRzLnVyaXMuanJlLXRhci1nen19IiwKICAgICJCT09UU1RSQVBfVVJJIjogInt7cmVzb3VyY2UuYXNzZXRzLnVyaXMuYm9vdHN0cmFwLXppcH19IiwKICAgIHt7I3NlcnZpY2Uuc2VydmljZV9hY2NvdW50X3NlY3JldH19CiAgICAiRENPU19TRVJWSUNFX0FDQ09VTlRfQ1JFREVOVElBTCI6IHsgInNlY3JldCI6ICJzZXJ2aWNlQ3JlZGVudGlhbCIgfSwKICAgICJNRVNPU19NT0RVTEVTIjogIntcImxpYnJhcmllc1wiOlt7XCJmaWxlXCI6XCJsaWJtZXNvcy1idW5kbGVcL2xpYlwvbWVzb3NcL2xpYmRjb3Nfc2VjdXJpdHkuc29cIixcIm1vZHVsZXNcIjpbe1wibmFtZVwiOiBcImNvbV9tZXNvc3BoZXJlX2Rjb3NfQ2xhc3NpY1JQQ0F1dGhlbnRpY2F0ZWVcIn0se1wibmFtZVwiOlwiY29tX21lc29zcGhlcmVfZGNvc19odHRwX0F1dGhlbnRpY2F0ZWVcIixcInBhcmFtZXRlcnNcIjpbe1wia2V5XCI6XCJqd3RfZXhwX3RpbWVvdXRcIixcInZhbHVlXCI6XCI1bWluc1wifSx7XCJrZXlcIjpcInByZWVtcHRpdmVfcmVmcmVzaF9kdXJhdGlvblwiLFwidmFsdWVcIjpcIjMwbWluc1wifV19XX1dfSIsCiAgICAiTUVTT1NfQVVUSEVOVElDQVRFRSI6ICJjb21fbWVzb3NwaGVyZV9kY29zX0NsYXNzaWNSUENBdXRoZW50aWNhdGVlIiwKICAgICJNRVNPU19IVFRQX0FVVEhFTlRJQ0FURUUiOiAiY29tX21lc29zcGhlcmVfZGNvc19odHRwX0F1dGhlbnRpY2F0ZWUiLAogICAge3svc2VydmljZS5zZXJ2aWNlX2FjY291bnRfc2VjcmV0fX0KICAgICJMSUJNRVNPU19VUkkiOiAie3tyZXNvdXJjZS5hc3NldHMudXJpcy5saWJtZXNvcy1idW5kbGUtdGFyLWd6fX0iCiAgfSwKICAiZmV0Y2giOiBbCiAgICB7ICJ1cmkiOiAie3tyZXNvdXJjZS5hc3NldHMudXJpcy5ib290c3RyYXAtemlwfX0iLCAiY2FjaGUiOiB0cnVlIH0sCiAgICB7ICJ1cmkiOiAie3tyZXNvdXJjZS5hc3NldHMudXJpcy5nZXRoLXNjcmlwdHMtemlwfX0iLCAiY2FjaGUiOiBmYWxzZSB9LAogICAgeyAidXJpIjogInt7cmVzb3VyY2UuYXNzZXRzLnVyaXMuanJlLXRhci1nen19IiwgImNhY2hlIjogdHJ1ZSB9LAogICAgeyAidXJpIjogInt7cmVzb3VyY2UuYXNzZXRzLnVyaXMuc2NoZWR1bGVyLXppcH19IiwgImNhY2hlIjogZmFsc2UgfSwKICAgIHsgInVyaSI6ICJ7e3Jlc291cmNlLmFzc2V0cy51cmlzLmxpYm1lc29zLWJ1bmRsZS10YXItZ3p9fSIsICJjYWNoZSI6IHRydWUgfQogIF0sCiAgInVwZ3JhZGVTdHJhdGVneSI6ewogICAgIm1pbmltdW1IZWFsdGhDYXBhY2l0eSI6IDAsCiAgICAibWF4aW11bU92ZXJDYXBhY2l0eSI6IDAKICB9LAogICJoZWFsdGhDaGVja3MiOiBbCiAgICB7CiAgICAgICJwcm90b2NvbCI6ICJNRVNPU19IVFRQIiwKICAgICAgInBhdGgiOiAiL3YxL2hlYWx0aCIsCiAgICAgICJncmFjZVBlcmlvZFNlY29uZHMiOiA5MDAsCiAgICAgICJpbnRlcnZhbFNlY29uZHMiOiAzMCwKICAgICAgInBvcnRJbmRleCI6IDAsCiAgICAgICJ0aW1lb3V0U2Vjb25kcyI6IDMwLAogICAgICAibWF4Q29uc2VjdXRpdmVGYWlsdXJlcyI6IDAKICAgIH0KICBdLAogICJwb3J0RGVmaW5pdGlvbnMiOiBbCiAgICB7CiAgICAgICJwb3J0IjogMCwKICAgICAgInByb3RvY29sIjogInRjcCIsCiAgICAgICJuYW1lIjogImFwaSIKICAgIH0KICBdCn0K"
+      },
+      "resource": {
+        "assets": {
+          "container": {
+            "docker": {
+              "ethstats_docker": "ethereumex/eth-stats-dashboard:v0.0.1"
+            }
+          },
+          "uris": {
+            "jre-tar-gz": "https://downloads.mesosphere.com/java/server-jre-8u192-linux-x64.tar.gz",
+            "libmesos-bundle-tar-gz": "https://downloads.mesosphere.com/libmesos-bundle/libmesos-bundle-1.11.0.tar.gz",
+            "bootstrap-zip": "https://github.com/iss-lab/dcos-ethereum/releases/download/v0.1.0/bootstrap.zip",
+            "scheduler-zip": "https://github.com/iss-lab/dcos-ethereum/releases/download/v0.1.0/ethereum-scheduler.zip",
+            "geth-scripts-zip": "https://github.com/iss-lab/dcos-ethereum/releases/download/v0.1.0/geth-scripts.zip"
+          }
+        },
+        "images": {
+          "icon-small": "https://github.com/dcos/dcos-ui/blob/master/plugins/services/src/img/icon-service-default-small.png?raw=true",
+          "icon-medium": "https://github.com/dcos/dcos-ui/blob/master/plugins/services/src/img/icon-service-default-medium.png?raw=true",
+          "icon-large": "https://github.com/dcos/dcos-ui/blob/master/plugins/services/src/img/icon-service-default-large.png?raw=true"
+        },
+        "cli": {
+          "binaries": {
+            "darwin": {
+              "x86-64": {
+                "contentHash": [
+                  {
+                    "algo": "sha256",
+                    "value": "b0dc012b0f344225148d9221c87ec93c629aec25c9e525c4257c62c1d883f3fb"
+                  }
+                ],
+                "kind": "executable",
+                "url": "https://github.com/iss-lab/dcos-ethereum/releases/download/v0.1.0/dcos-service-cli-darwin"
+              }
+            },
+            "linux": {
+              "x86-64": {
+                "contentHash": [
+                  {
+                    "algo": "sha256",
+                    "value": "e07545dc370855280f0701ece6c872befcb946e351c5778e953b0fbbb7173ccb"
+                  }
+                ],
+                "kind": "executable",
+                "url": "https://github.com/iss-lab/dcos-ethereum/releases/download/v0.1.0/dcos-service-cli-linux"
+              }
+            },
+            "windows": {
+              "x86-64": {
+                "contentHash": [
+                  {
+                    "algo": "sha256",
+                    "value": "33e84a1ef1edd30f01c681b210068bf60c4e9b0c7c4ca3b6ef43b170f235bd6e"
+                  }
+                ],
+                "kind": "executable",
+                "url": "https://github.com/iss-lab/dcos-ethereum/releases/download/v0.1.0/dcos-service-cli.exe"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

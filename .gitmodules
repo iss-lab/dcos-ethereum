@@ -1,0 +1,3 @@
+[submodule "dcos-commons/submodule"]
+	path = dcos-commons/submodule
+	url = https://github.com/iss-lab/dcos-commons

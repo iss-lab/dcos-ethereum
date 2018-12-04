@@ -1,0 +1,21 @@
+{
+  "service": {
+    "name": "ethereum"
+  },
+  "geth": {
+    "network_id": 3,
+    "syncmode": "fast",
+    "create_genesis": false
+  },
+  "boot": {
+    "count": 0
+  },
+  "sealer": {
+    "create_accounts": false,
+    "args": "--testnet --metrics --mine --minerthreads=1"
+  },
+  "client": {
+    "create_accounts": false,
+    "args": "--testnet --metrics"
+  }
+}

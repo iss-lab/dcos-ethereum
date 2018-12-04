@@ -1,0 +1,19 @@
+{
+  "service": {
+    "name": "ethereum"
+  },
+  "geth": {
+    "network_id": 1,
+    "syncmode": "fast",
+    "create_genesis": false
+  },
+  "boot": {
+    "count": 0
+  },
+  "sealer": {
+    "create_accounts": false
+  },
+  "client": {
+    "create_accounts": false
+  }
+}

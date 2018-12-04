@@ -1,0 +1,13 @@
+rootProject.name = 'dcos-commons'
+
+include 'frameworks/ethereum'
+project(":frameworks/ethereum").name = "ethereum"
+
+include 'sdk/scheduler'
+project(':sdk/scheduler').name = 'scheduler'
+
+include 'sdk/testing'
+project(':sdk/testing').name = 'testing'
+
+// For Gradle 5.0 Upgrade compatibility
+enableFeaturePreview('STABLE_PUBLISHING')

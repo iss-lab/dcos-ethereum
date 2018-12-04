@@ -1,0 +1,8 @@
+{
+  "ethstats": {
+    "labels": "traefik.enable:true,traefik.frontend.entryPoints:gethStats,traefik.frontend.rule:PathPrefix:/"
+  },
+  "client": {
+    "labels": "traefik.enable:true,traefik.geth-client-http-port.frontend.entryPoints:gethClientHTTP,traefik.geth-client-http-port.frontend.rule:PathPrefix:/traefik.geth-client-ws-port.frontend.entryPoints:gethClientWS,traefik.geth-client-ws-port.frontend.rule:PathPrefix:/"
+  }
+}

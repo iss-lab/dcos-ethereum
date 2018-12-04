@@ -1,0 +1,14 @@
+{
+  "sealer": {
+    "create_accounts": false,
+    "unlock_accounts": true,
+    "account_privatekeys": "38000e15ca07309cc2d0b30faaaadb293c45ea222a117e9e9c6a2a9872bb3bcf",
+    "account_secret": "mysecret"
+  },
+  "client": {
+    "create_accounts": false,
+    "unlock_accounts": false,
+    "account_privatekeys": "38000e15ca07309cc2d0b30faaaadb293c45ea222a117e9e9c6a2a9872bb3bcf",
+    "account_secret": "mysecret"
+  }
+}

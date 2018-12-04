@@ -1,0 +1,26 @@
+group 'com.iss'
+version '1.1-SNAPSHOT'
+
+apply plugin: 'application'
+
+dependencies {
+    compile project(":scheduler")
+    testCompile project(":testing")
+}
+
+distributions {
+    main {
+        baseName = 'ethereum-scheduler'
+        version = ''
+    }
+}
+
+task zipGethNode(type: Zip) {
+   from 'assets/'
+   include '*'
+   include '*/*'
+   archiveName 'geth-scripts.zip'
+   destinationDir(file('build/distributions'))
+}
+
+mainClassName = 'com.iss.ethereum.scheduler.Main'

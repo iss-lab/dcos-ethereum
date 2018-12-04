@@ -1,0 +1,71 @@
+{
+  "service": {
+    "name": "ethereum",
+    "user": "root",
+    "service_account": "",
+    "service_account_secret": "",
+    "virtual_network_enabled": false,
+    "virtual_network_name": "dcos",
+    "virtual_network_plugin_labels": "",
+    "mesos_api_version": "V1",
+    "log_level": "INFO"
+  },
+  "geth": {
+    "network_id": 18,
+    "syncmode": "full",
+    "create_genesis": true,
+    "consensus_engine": "clique",
+    "clique_period": 15
+  },
+  "boot": {
+    "count": 1,
+    "cpus": 0.1,
+    "mem": 256,
+    "disk": 15000,
+    "disk_type": "ROOT",
+    "placement_constraint": "",
+    "labels": "",
+    "verbosity": 3
+  },
+  "ethstats": {
+    "count": 1,
+    "cpus": 1,
+    "mem": 1024,
+    "placement_constraint": "",
+    "labels": "",
+    "verbosity": 3,
+    "websocket_secret": "my-ws-secret"
+  },
+  "sealer": {
+    "count": 3,
+    "cpus": 1,
+    "mem": 1024,
+    "disk": 15000,
+    "disk_type": "ROOT",
+    "placement_constraint": "",
+    "labels": "",
+    "args": "--metrics --mine --minerthreads=1",
+    "verbosity": 3,
+    "rpcapi": "debug,db,personal,eth,network,web3,net,miner",
+    "create_accounts": true,
+    "unlock_accounts": true,
+    "account_privatekeys": "",
+    "account_secret": "p@ssw0rd"
+  },
+  "client": {
+    "count": 2,
+    "cpus": 1,
+    "mem": 1024,
+    "disk": 15000,
+    "disk_type": "ROOT",
+    "placement_constraint": "",
+    "labels": "",
+    "args": "--metrics",
+    "verbosity": 3,
+    "rpcapi": "debug,db,personal,eth,network,web3,net,miner",
+    "create_accounts": true,
+    "unlock_accounts": true,
+    "account_privatekeys": "",
+    "account_secret": "p@ssw0rd"
+  }
+}
