@@ -40,7 +40,7 @@ mkdir -p run
 : "${GETH_MODE:=private}"
 : "${GETH_SYNCMODE:=full}"
 : "${GETH_ARGS:=--metrics}"
-: "${ENDPOINTS_URL:=http://master.mesos/service/${FRAMEWORK_NAME}/v1/endpoints}"
+: "${ENDPOINTS_URL:=http://api.${FRAMEWORK_NAME}.marathon.l4lb.thisdcos.directory:80/v1/endpoints}"
 
 GETH_ARGS="${GETH_ARGS} --networkid ${NETWORK_ID}"
 GETH_ARGS="${GETH_ARGS} --verbosity ${GETH_VERBOSITY}"
