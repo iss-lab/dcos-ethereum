@@ -1,71 +1,11 @@
 # DC/OS Ethereum Usage
 
-## Connecting to Ethereum Nodes
+### Validate installation
 
-### List Endpoints
+Validate that the installation added the enhanced DC/OS CLI for Ethereum:
 
-```
-dcos ethereum endpoints
-```
-
-Sample output:
-
-```
-[
-  "geth-boot-p2p-port",
-  "geth-client-http-port",
-  "geth-client-p2p-port",
-  "geth-client-ws-port",
-  "geth-ethstats-http-port",
-  "geth-sealer-http-port",
-  "geth-sealer-p2p-port",
-  "geth-sealer-ws-port"
-]
-```
-
-#### Client Node HTTP
-
-```
-dcos ethereum endpoints geth-client-http-port
-```
-
-Sample output:
-
-```
-{
-  "address": [
-    "<ip address>:<port>"
-  ],
-  "dns": [
-    "client-0-node.ethereum.autoip.dcos.thisdcos.directory:<port>"
-  ]
-}
-```
-
-#### Sealer Node HTTP
-
-```
-dcos ethereum endpoints geth-sealer-http-port
-```
-
-Sample output:
-
-```
-{
-  "address": [
-    "<ip-address>:<port>"
-  ],
-  "dns": [
-    "sealer-0-node.ethereum.autoip.dcos.thisdcos.directory:<port>"
-  ]
-}
-```
-
-## All CLI Commands
-
-You can get the complete list of commands by running `dcos ethereum --help`
-
-```
+```bash
+$ dcos ethereum --help
 usage: dcos ethereum [<flags>] <command>
 
 
@@ -223,3 +163,108 @@ Commands:
 
     --json  Show raw JSON response instead of user-friendly tree
 ```
+
+In addition, you can go to the DC/OS UI to validate that the Ethereum service is running and healthy.
+
+### List Endpoints
+
+You can retrieve the connection info from the CLI:
+
+```
+$ dcos ethereum endpoints
+```
+
+Sample output:
+
+```
+[
+  "geth-boot-p2p-port",
+  "geth-client-http-port",
+  "geth-client-p2p-port",
+  "geth-client-ws-port",
+  "geth-ethstats-http-port",
+  "geth-sealer-http-port",
+  "geth-sealer-p2p-port",
+  "geth-sealer-ws-port"
+]
+```
+
+#### Client Node HTTP
+
+```bash
+$ dcos ethereum endpoints geth-client-http-port
+{
+  "address": [
+    "10.0.3.228:1032",
+    "10.0.3.228:1035"
+  ],
+  "dns": [
+    "client-0-node.ethereum.autoip.dcos.thisdcos.directory:1032",
+    "client-1-node.ethereum.autoip.dcos.thisdcos.directory:1035"
+  ]
+}
+```
+
+## Perform RPC operations
+
+We will use geth console interactively, so we will start a geth-console task:
+
+```
+$ vi geth-console.json
+{
+  "id": "/geth-console",
+  "instances": 1,
+  "container": {
+    "type": "MESOS",
+    "docker": {
+      "image": "ethereum/client-go:alltools-latest"
+    }
+  },
+  "cpus": 0.5,
+  "mem": 256,
+  "cmd": "while true; do sleep 10000000; done"
+}
+
+$ dcos marathon app add geth-console.json
+Created deployment fc984dfa-30d4-4d68-8b9e-b9e8038cd20d
+```
+
+Start a `geth attach` session in the previously started container:
+
+```
+$ dcos task exec -it geth-console /usr/local/bin/geth attach http://10.0.3.228:1032
+Welcome to the Geth JavaScript console!
+
+instance: Geth/v1.8.12-stable-37685930/linux-amd64/go1.10.3
+coinbase: 0x0fd4aef71ee0edd5d18a4d76b959159a14d2fe32
+at block: 5906 (Wed, 05 Dec 2018 20:33:46 UTC)
+ modules: debug:1.0 eth:1.0 miner:1.0 net:1.0 personal:1.0 rpc:1.0 web3:1.0
+
+>
+```
+
+You are now connected to your Ethereum cluster. Let's find the account created for this node:
+
+```
+> eth.accounts
+
+["0x0fd4aef71ee0edd5d18a4d76b959159a14d2fe32"]
+```
+
+Next, check the account balance:
+
+```
+> eth.getBalance("0x0fd4aef71ee0edd5d18a4d76b959159a14d2fe32")
+
+9.04625697166532776746648320380374280103671755200316906558262375061821325312e+74
+```
+
+We can also find the number of peers connected to this node:
+
+```
+> net.peerCount
+
+4
+```
+
+For more information on geth attach and the JSRE REPL console, visit [github.com/ethereum/go-ethereum/wiki/JavaScript-Console](https://github.com/ethereum/go-ethereum/wiki/JavaScript-Console/). The available commands can be found at [github.com/ethereum/wiki/wiki/JavaScript-API](https://github.com/ethereum/wiki/wiki/JavaScript-API).

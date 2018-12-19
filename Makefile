@@ -27,7 +27,7 @@ SDK_DIR ?= ${BASE_DIR}/dcos-commons
 FRAMEWORK_DIR ?= ${BASE_DIR}/dcos-commons/frameworks/ethereum
 export ETHEREUM_DOCUMENTATION_PATH ?= https://github.com/iss-lab/dcos-ethereum/tree/master/docs
 export ETHEREUM_ISSUES_PATH ?= https://github.com/iss-lab/dcos-ethereum/issues
-export PACKAGE_VERSION ?= 0.1.0
+export PACKAGE_VERSION ?= 0.1.1
 
 JQ_URL ?= https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
 JQ_DIST ?= jq

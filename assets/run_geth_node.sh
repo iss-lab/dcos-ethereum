@@ -40,6 +40,7 @@ mkdir -p run
 : "${GETH_MODE:=private}"
 : "${GETH_SYNCMODE:=full}"
 : "${GETH_ARGS:=--metrics}"
+: "${NODE_MEM:=1024}"
 : "${ENDPOINTS_URL:=http://api.${FRAMEWORK_NAME}.marathon.l4lb.thisdcos.directory:80/v1/endpoints}"
 
 GETH_ARGS="${GETH_ARGS} --networkid ${NETWORK_ID}"
@@ -48,6 +49,7 @@ GETH_ARGS="${GETH_ARGS} --syncmode ${GETH_SYNCMODE}"
 GETH_ARGS="${GETH_ARGS} --port ${GETH_P2P_PORT}"
 GETH_ARGS="${GETH_ARGS} --datadir ethdata"
 GETH_ARGS="${GETH_ARGS} --ipcpath run/geth.ipc"
+GETH_ARGS="${GETH_ARGS} --cache=${NODE_MEM}"
 
 if [ -z ${GETH_RPCAPI+x} ] ; then
     echo "Disabling rpc api listeners"
