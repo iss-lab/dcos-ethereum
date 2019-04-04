@@ -35,6 +35,8 @@ GETH_DIR ?= geth-alltools-linux-amd64-1.8.12-37685930
 GETH_DIST ?= ${GETH_DIR}.tar.gz
 GETH_URL ?= https://gethstore.blob.core.windows.net/builds/${GETH_DIST}
 
+PANTHEON_URL ?= https://bintray.com/consensys/pegasys-repo/download_file?file_path=pantheon-1.0.2.tar.gz
+
 GETH_SCRIPTS_DIST ?= ${FRAMEWORK_DIR}/build/distributions/geth-scripts.zip
 SCHEDULER_DIST ?= ${FRAMEWORK_DIR}/build/distributions/$(shell basename ${FRAMEWORK_DIR})-scheduler.zip
 BOOTSTRAP_GETH_DIST ?= bootstrap_geth
