@@ -8,7 +8,7 @@ assets/bootnode
 assets/bootstrap_geth
 assets/geth
 assets/jq
-bootstrap_geth
+./bootstrap_geth
 geth-alltools-linux-amd64-*
 jq
 .gopath
